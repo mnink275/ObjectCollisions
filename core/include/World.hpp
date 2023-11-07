@@ -3,8 +3,8 @@
 #include <SFML/Graphics.hpp>
 
 #include <Category.hpp>
+#include <Rectangle.hpp>
 #include <SceneNode.hpp>
-#include <Shape.hpp>
 
 namespace ink {
 
@@ -28,6 +28,8 @@ class World final {
  private:
   bool matchesCategories(SceneNode::NodePair& pair, Category first,
                          Category second) const noexcept;
+  void spawnObstacles();
+  void spawnBalls();
 
   SceneNode scene_graph_;
   sf::RenderWindow& window_;
@@ -35,7 +37,7 @@ class World final {
   sf::FloatRect world_bounds_;
   sf::Vector2f world_center_;
 
-  Shape* player_;
+  Rectangle* player_;
 };
 
 }  // namespace ink

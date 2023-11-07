@@ -6,20 +6,18 @@ namespace ink {
 
 class Shape : public SceneNode {
  public:
- public:
   using SceneNode::SceneNode;
-  Shape(const Category category, const sf::Color color);
+  Shape(const Category category, const sf::Color color,
+        std::unique_ptr<sf::Shape> shape);
 
   sf::FloatRect getBoundingRect() const override;
-  void handlePlayerInput(const sf::Event::MouseMoveEvent event);
 
  private:
   void drawCurrent(sf::RenderTarget& target,
                    const sf::RenderStates states) const override;
 
  private:
-  const sf::Vector2f rectangle_size{50.0f, 50.0f};
-  sf::RectangleShape rectangle_;
+  std::unique_ptr<sf::Shape> shape_;
 };
 
 }  // namespace ink
