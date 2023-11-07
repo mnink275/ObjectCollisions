@@ -4,7 +4,7 @@
 
 #include <Category.hpp>
 #include <SceneNode.hpp>
-#include <Player.hpp>
+#include <Shape.hpp>
 
 namespace ink {
 
