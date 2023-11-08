@@ -17,7 +17,7 @@ World::World(sf::RenderWindow& window)
   // spawn player
   auto player = std::make_unique<Rectangle>(Category::kPlayer, sf::Color::Blue,
                                             sf::Vector2f{50.0f, 50.0f});
-  player->setPosition({0.0f, 0.0f});
+  player->setShapePosition({0.0f, 0.0f});
   player_ = player.get();
   scene_graph_.attachChild(std::move(player));
 
@@ -45,34 +45,25 @@ void World::handleCollisions() {
   scene_graph_.checkSceneCollision(scene_graph_, collisions);
   for (auto pair : collisions) {
     if (matchesCategories(pair, Category::kPlayer, Category::kObstacle)) {
-      std::cout << "Player and Obstacle collision!\n";
+      std::cout << "Player and Obstacle collision\n";
 
       assert(dynamic_cast<Rectangle*>(pair.first));
-      auto* player = static_cast<Rectangle*>(pair.first);
       assert(dynamic_cast<Rectangle*>(pair.second));
+      auto* player = static_cast<Rectangle*>(pair.first);
       auto* obstacle = static_cast<Rectangle*>(pair.second);
 
-      auto intersection_opt = player->getBoundingRect().findIntersection(
-          obstacle->getBoundingRect());
-      assert(intersection_opt.has_value());
-      auto intersection = intersection_opt.value();
+      player->handleObstacleCollision(obstacle);
+    } else if (matchesCategories(pair, Category::kBall, Category::kObstacle)) {
+      std::cout << "Ball and Obstacle collision\n";
 
-      auto is_vertical_collision = intersection.width < intersection.height;
-      auto shift = std::min(intersection.width, intersection.height);
-      auto player_pos = player->getPosition();
-      auto obstacle_pos = obstacle->getPosition();
-      if (is_vertical_collision) {
-        auto sign = (player_pos.x < obstacle_pos.x) ? -1 : +1;
-        std::cout << "Vertical: ";
-        std::cout << player_pos.x << ' ' << obstacle_pos.x << '\n';
-        player_pos.x += shift * sign;
-      } else {
-        auto sign = (player_pos.y < obstacle_pos.y) ? -1 : +1;
-        std::cout << "Horizontal: ";
-        std::cout << player_pos.y << ' ' << obstacle_pos.y << '\n';
-        player_pos.y += shift * sign;
-      }
-      player->setPosition(player_pos);
+      assert(dynamic_cast<Circle*>(pair.first));
+      assert(dynamic_cast<Rectangle*>(pair.second));
+      auto* circle = static_cast<Circle*>(pair.first);
+      auto* obstacle = static_cast<Rectangle*>(pair.second);
+
+      auto normal = obstacle->getIntersectionNormal(circle->getBoundingRect());
+      circle->handleObstacleCollision(obstacle);
+      circle->handleElasticCollision(normal);
     }
   }
 }
@@ -101,7 +92,7 @@ void World::spawnObstacles() {
     for (auto y = shift.y; y < world_bounds_.height; y += shift.y) {
       auto obstacle = std::make_unique<Rectangle>(
           Category::kObstacle, sf::Color::Red, sf::Vector2f{50.0f, 50.0f});
-      obstacle->setPosition({x, y});
+      obstacle->setShapePosition({x, y});
       scene_graph_.attachChild(std::move(obstacle));
     }
   }
@@ -109,7 +100,7 @@ void World::spawnObstacles() {
 
 void World::spawnBalls() {
   auto ball = std::make_unique<Circle>(Category::kBall, sf::Color::Green, 8.0f);
-  ball->setPosition({20.0f, 20.0f});
+  ball->setShapePosition({20.0f, 20.0f});
   scene_graph_.attachChild(std::move(ball));
 }
 

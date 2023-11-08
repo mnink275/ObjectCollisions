@@ -11,12 +11,14 @@ class Shape : public SceneNode {
         std::unique_ptr<sf::Shape> shape);
 
   sf::FloatRect getBoundingRect() const override;
+  virtual void setShapePosition(sf::Vector2f posision);
+  void handleObstacleCollision(Shape* obstacle);
 
  private:
   void drawCurrent(sf::RenderTarget& target,
                    const sf::RenderStates states) const override;
 
- private:
+ protected:
   std::unique_ptr<sf::Shape> shape_;
 };
 
