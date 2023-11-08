@@ -30,10 +30,10 @@ class World final {
                          Category second) const noexcept;
   void spawnObstacles();
   void spawnBalls();
+  void spawnWalls();
 
   SceneNode scene_graph_;
   sf::RenderWindow& window_;
-  sf::View world_view_;
   sf::FloatRect world_bounds_;
   sf::Vector2f world_center_;
 

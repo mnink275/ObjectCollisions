@@ -9,9 +9,7 @@ namespace ink {
 
 World::World(sf::RenderWindow& window)
     : window_(window),
-      world_view_(window.getDefaultView()),
-      world_bounds_({0.f, 0.f},
-                    {world_view_.getSize().x, world_view_.getSize().y}),
+      world_bounds_({0.f, 0.f}, sf::Vector2f{window.getSize()}),
       world_center_(world_bounds_.width / 2, world_bounds_.height / 2),
       player_(nullptr) {
   // spawn player
@@ -24,6 +22,9 @@ World::World(sf::RenderWindow& window)
   // spawn other objects
   spawnObstacles();
   spawnBalls();
+
+  // spawn world bounds
+  spawnWalls();
 }
 
 void World::update(const sf::Time dt) {
@@ -31,10 +32,7 @@ void World::update(const sf::Time dt) {
   handleCollisions();
 }
 
-void World::draw() const {
-  window_.setView(world_view_);
-  window_.draw(scene_graph_);
-}
+void World::draw() const { window_.draw(scene_graph_); }
 
 void World::handlePlayerInput(const sf::Event::MouseMoveEvent event) {
   player_->handlePlayerInput(event);
@@ -99,9 +97,46 @@ void World::spawnObstacles() {
 }
 
 void World::spawnBalls() {
-  auto ball = std::make_unique<Circle>(Category::kBall, sf::Color::Green, 8.0f);
-  ball->setShapePosition({20.0f, 20.0f});
-  scene_graph_.attachChild(std::move(ball));
+  for (float x = 20.0f; x < world_bounds_.width; x += 40.0f) {
+    auto ball =
+        std::make_unique<Circle>(Category::kBall, sf::Color::Green, 8.0f);
+    ball->setShapePosition({x, 20.0f});
+    scene_graph_.attachChild(std::move(ball));
+  }
+}
+
+void World::spawnWalls() {
+  auto walls_holder = std::make_unique<SceneNode>();
+
+  auto world_bounds = world_bounds_.getSize();
+  float width = world_bounds.x;
+  float height = world_bounds.y;
+  const auto wall_thickness_ = 10.0f;
+
+  // `positions` contains left-top corner of the walls
+  // walls "grow" from the left-top corner to the bottom-right
+  static const std::vector<sf::Vector2f> positions = {
+      {0.0f, 0.0f},                       // left
+      {0.0f, 0.0f},                       // top
+      {width - wall_thickness_, 0.0f},    // right
+      {0.0f, height - wall_thickness_}};  // bottom
+  static const std::vector<sf::Vector2f> sizes = {
+      {wall_thickness_, height},  // left
+      {width, wall_thickness_},   // top
+      {wall_thickness_, height},  // right
+      {width, wall_thickness_}};  // bottom
+
+  assert(positions.size() == sizes.size());
+  static const std::size_t kWallsCount = positions.size();
+
+  for (std::size_t i = 0; i < kWallsCount; ++i) {
+    auto wall = std::make_unique<Rectangle>(Category::kObstacle, sf::Color::Red,
+                                            sizes[i]);
+    wall->setShapePosition(positions[i]);
+    walls_holder->attachChild(std::move(wall));
+  }
+
+  scene_graph_.attachChild(std::move(walls_holder));
 }
 
 }  // namespace ink

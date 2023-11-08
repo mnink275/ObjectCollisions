@@ -12,11 +12,11 @@ Circle::Circle(const Category category, const sf::Color color, float radius)
 void Circle::handleElasticCollision(sf::Vector2f normal) {
   auto angle = velocity_.angleTo(normal);
   std::cout << "Normal: " << normal.x << ' ' << normal.y << '\n';
-  auto normalized = velocity_.normalized();
-  std::cout << "Velocity: " << normalized.x << ' ' << normalized.y << '\n';
   std::cout << "Angle: " << angle.asDegrees() << '\n';
-  assert(angle >= sf::degrees(0));
-  assert(angle <= sf::degrees(90));
+  if (angle > sf::degrees(90))
+    angle -= sf::degrees(90);
+  else if (angle < sf::degrees(-90))
+    angle += sf::degrees(90);
   velocity_ = velocity_.rotatedBy(2 * angle - sf::degrees(180));
 }
 
