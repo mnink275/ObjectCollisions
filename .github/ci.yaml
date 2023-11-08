@@ -1,0 +1,30 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: ${{ matrix.config.name }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - { name: Shared, flags: -DBUILD_SHARED_LIBS=TRUE }
+        - { name: Static, flags: -DBUILD_SHARED_LIBS=FALSE }
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Git Sumbodule init
+      run: git submodule update --init
+
+    - name: Configure
+      shell: bash
+      run: cmake -S . -B build ${{matrix.config.flags}}
+
+    - name: Build
+      shell: bash
+      run: cmake --build build --config Debug

@@ -1,6 +1,6 @@
 # Object Collisions
 
-- Simple simulation of object collisions with visualization using graphics.
+- Simple simulation of object collisions with visualization using SFML graphics.
 
 ## Running
 - Linux:
