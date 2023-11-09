@@ -7,6 +7,7 @@ namespace ink {
 class Rectangle final : public Shape {
  public:
   struct Bound final {
+    sf::Vector2f initial_pos{};
     sf::Vector2f normal{};
     float thickness{};
     sf::FloatRect rect{};
@@ -18,7 +19,7 @@ class Rectangle final : public Shape {
             const sf::Vector2f sizes);
 
   void handlePlayerInput(const sf::Event::MouseMoveEvent event);
-  sf::Vector2f getIntersectionNormal(sf::FloatRect other) const noexcept;
+  std::optional<sf::Vector2f> getIntersectionNormal(sf::FloatRect other) const noexcept;
   void setShapePosition(sf::Vector2f posision) override;
 
  private:

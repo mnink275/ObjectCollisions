@@ -50,7 +50,8 @@ void World::handleCollisions() {
       auto* obstacle = static_cast<Rectangle*>(pair.second);
 
       player->handleObstacleCollision(obstacle);
-    } else if (matchesCategories(pair, Category::kBall, Category::kObstacle)) {
+    } else if (matchesCategories(pair, Category::kBall, Category::kObstacle)
+    || matchesCategories(pair, Category::kBall, Category::kPlayer)) {
       // std::cout << "Ball and Obstacle collision\n";
       assert(dynamic_cast<Circle*>(pair.first));
       assert(dynamic_cast<Rectangle*>(pair.second));
@@ -58,8 +59,10 @@ void World::handleCollisions() {
       auto* obstacle = static_cast<Rectangle*>(pair.second);
 
       auto normal = obstacle->getIntersectionNormal(circle->getBoundingRect());
-      circle->handleObstacleCollision(obstacle);
-      circle->handleElasticCollision(normal);
+      if (normal.has_value()) {
+        circle->handleObstacleCollision(obstacle);
+        circle->handleElasticCollision(normal.value());
+      }
     }
   }
 }
@@ -96,8 +99,8 @@ void World::spawnObstacles() {
 
 void World::spawnBalls() {
   sf::Vector2f velocity{300.0f, 300.0f};
-  const auto begin = 2 * walls_thickness_;
-  const auto end = world_bounds_.width - 2 * walls_thickness_;
+  const auto begin = 10 * walls_thickness_;
+  const auto end = world_bounds_.width - begin;
   const auto spawn_height = 2 * walls_thickness_;
   for (float x = begin; x < end; x += 20.0f) {
     auto ball = std::make_unique<Circle>(Category::kBall, sf::Color::Green,

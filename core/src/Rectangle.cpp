@@ -16,7 +16,7 @@ Rectangle::Rectangle(const Category category, const sf::Color color,
   sf::Vector2f normal{0.0f, 1.0f};
   for (std::size_t i = 0; i < shape_->getPointCount(); ++i) {
     sf::FloatRect rect{shape_->getPoint(i), bound_sizes[i]};
-    Bound bound{normal, thickness, rect};
+    Bound bound{shape_->getPoint(i), normal, thickness, rect};
     bounds_.push_back(std::move(bound));
     normal = normal.rotatedBy(sf::degrees(90.0f));
   }
@@ -30,7 +30,7 @@ void Rectangle::handlePlayerInput(const sf::Event::MouseMoveEvent event) {
   }
 }
 
-sf::Vector2f Rectangle::getIntersectionNormal(
+std::optional<sf::Vector2f> Rectangle::getIntersectionNormal(
     sf::FloatRect other) const noexcept {
   auto max_intersection_square = 0.0f;
   sf::Vector2f normal{};
@@ -45,17 +45,17 @@ sf::Vector2f Rectangle::getIntersectionNormal(
       normal = bound.normal;
     }
   }
-  assert(normal != sf::Vector2f{});
+  
+  if (normal == sf::Vector2f{}) return std::nullopt;
+
   return normal;
 }
 
 void Rectangle::setShapePosition(sf::Vector2f posision) {
   setPosition(posision);
-  if (getCategory() == Category::kObstacle) {
-    for (auto&& bound : bounds_) {
-      bound.rect.left += posision.x;
-      bound.rect.top += posision.y;
-    }
+  for (auto&& bound : bounds_) {
+    bound.rect.left = bound.initial_pos.x + posision.x;
+    bound.rect.top = bound.initial_pos.y + posision.y;
   }
 }
 
@@ -67,7 +67,7 @@ void Rectangle::drawCurrent(sf::RenderTarget& target,
   for (auto&& bound : bounds_) {
     sf::RectangleShape bounds_rect{bound.rect.getSize()};
     bounds_rect.setPosition(bound.rect.getPosition());
-    bounds_rect.setFillColor(sf::Color::Blue);
+    bounds_rect.setFillColor(sf::Color::White);
     target.draw(bounds_rect);
   }
 }
