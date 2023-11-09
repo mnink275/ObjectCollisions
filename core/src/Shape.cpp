@@ -17,21 +17,21 @@ void Shape::setShapePosition(sf::Vector2f posision) { setPosition(posision); }
 void Shape::handleObstacleCollision(Shape* obstacle) {
   auto intersection_opt =
       getBoundingRect().findIntersection(obstacle->getBoundingRect());
-  assert(intersection_opt.has_value());
-  auto intersection = intersection_opt.value();
+  if (!intersection_opt.has_value()) return;
+  const auto intersection = intersection_opt.value();
 
   auto is_vertical_collision = intersection.width < intersection.height;
-  auto shift = std::min(intersection.width, intersection.height);
-  auto player_pos = getPosition();
-  auto obstacle_pos = obstacle->getPosition();
+  const auto shift = std::min(intersection.width, intersection.height);
+  auto shape_pos = getPosition();
+  const auto obstacle_pos = obstacle->getPosition();
   if (is_vertical_collision) {
-    auto sign = (player_pos.x < obstacle_pos.x) ? -1 : +1;
-    player_pos.x += shift * sign;
+    auto sign = (shape_pos.x < obstacle_pos.x) ? -1 : +1;
+    shape_pos.x += shift * sign;
   } else {
-    auto sign = (player_pos.y < obstacle_pos.y) ? -1 : +1;
-    player_pos.y += shift * sign;
+    auto sign = (shape_pos.y < obstacle_pos.y) ? -1 : +1;
+    shape_pos.y += shift * sign;
   }
-  setShapePosition(player_pos);
+  setShapePosition(shape_pos);
 }
 
 void Shape::drawCurrent(sf::RenderTarget& target,
