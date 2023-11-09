@@ -28,6 +28,7 @@ class World final {
  private:
   bool matchesCategories(SceneNode::NodePair& pair, Category first,
                          Category second) const noexcept;
+  static float getRandomBetween(int left, int right);
   void spawnObstacles();
   void spawnBalls();
   void spawnWalls();

@@ -1,6 +1,7 @@
 #include <World.hpp>
 
 #include <iostream>
+#include <random>
 #include <set>
 
 #include <Circle.hpp>
@@ -50,8 +51,8 @@ void World::handleCollisions() {
       auto* obstacle = static_cast<Rectangle*>(pair.second);
 
       player->handleObstacleCollision(obstacle);
-    } else if (matchesCategories(pair, Category::kBall, Category::kObstacle)
-    || matchesCategories(pair, Category::kBall, Category::kPlayer)) {
+    } else if (matchesCategories(pair, Category::kBall, Category::kObstacle) ||
+               matchesCategories(pair, Category::kBall, Category::kPlayer)) {
       // std::cout << "Ball and Obstacle collision\n";
       assert(dynamic_cast<Circle*>(pair.first));
       assert(dynamic_cast<Rectangle*>(pair.second));
@@ -85,6 +86,13 @@ bool World::matchesCategories(SceneNode::NodePair& pair, Category first,
   }
 }
 
+float World::getRandomBetween(int left, int right) {
+  static std::random_device seed;
+  static std::mt19937 gen(seed());
+  std::uniform_int_distribution<> distrib(left, right);
+  return distrib(gen);
+}
+
 void World::spawnObstacles() {
   sf::Vector2f shift{world_bounds_.width * 0.2f, world_bounds_.height * 0.2f};
   for (auto x = shift.x; x < world_bounds_.width; x += shift.x) {
@@ -98,13 +106,15 @@ void World::spawnObstacles() {
 }
 
 void World::spawnBalls() {
-  sf::Vector2f velocity{300.0f, 300.0f};
+  static const int velocity_bound = 500;
+  auto rand = [](){ return getRandomBetween(-velocity_bound, velocity_bound); };
   const auto begin = 10 * walls_thickness_;
   const auto end = world_bounds_.width - begin;
   const auto spawn_height = 2 * walls_thickness_;
   for (float x = begin; x < end; x += 20.0f) {
+    sf::Vector2f velocity{rand(), rand()};
     auto ball = std::make_unique<Circle>(Category::kBall, sf::Color::Green,
-                                         8.0f, velocity);
+                                         8.0f, std::move(velocity));
     ball->setShapePosition({x, spawn_height});
     scene_graph_.attachChild(std::move(ball));
   }
