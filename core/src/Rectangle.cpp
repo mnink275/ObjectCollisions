@@ -45,7 +45,7 @@ std::optional<sf::Vector2f> Rectangle::getIntersectionNormal(
       normal = bound.normal;
     }
   }
-  
+
   if (normal == sf::Vector2f{}) return std::nullopt;
 
   return normal;
@@ -58,19 +58,5 @@ void Rectangle::setShapePosition(sf::Vector2f posision) {
     bound.rect.top = bound.initial_pos.y + posision.y;
   }
 }
-
-#if 0
-void Rectangle::drawCurrent(sf::RenderTarget& target,
-                            const sf::RenderStates states) const {
-  target.draw(*shape_, states);
-
-  for (auto&& bound : bounds_) {
-    sf::RectangleShape bounds_rect{bound.rect.getSize()};
-    bounds_rect.setPosition(bound.rect.getPosition());
-    bounds_rect.setFillColor(sf::Color::White);
-    target.draw(bounds_rect);
-  }
-}
-#endif
 
 }  // namespace ink

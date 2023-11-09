@@ -12,7 +12,7 @@ namespace ink {
 
 class SceneNode : public sf::Transformable, public sf::Drawable {
  public:
-  using Ptr = std::unique_ptr<SceneNode>;
+  using NodePtr = std::unique_ptr<SceneNode>;
   using NodePair = std::pair<SceneNode*, SceneNode*>;
 
   SceneNode(Category category = Category::kNone);
@@ -24,8 +24,8 @@ class SceneNode : public sf::Transformable, public sf::Drawable {
   SceneNode(SceneNode&&) noexcept = default;
   SceneNode& operator=(SceneNode&&) noexcept = default;
 
-  void attachChild(Ptr child);
-  Ptr detachChild(const SceneNode& node);
+  void attachChild(NodePtr child);
+  NodePtr detachChild(const SceneNode& node);
   void update(const sf::Time dt);
 
   void checkSceneCollision(SceneNode& scene_root,
@@ -46,7 +46,8 @@ class SceneNode : public sf::Transformable, public sf::Drawable {
   sf::Vector2f getWorldPosition() const;
   bool isCollide(const SceneNode& lhs, const SceneNode& rhs) const;
 
-  std::vector<Ptr> children_;
+ private:
+  std::vector<NodePtr> children_;
   SceneNode* parent_;
   Category category_;
 };

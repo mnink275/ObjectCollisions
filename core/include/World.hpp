@@ -9,8 +9,6 @@
 namespace ink {
 
 class World final {
-  using Ptr = SceneNode::Ptr;
-
  public:
   explicit World(sf::RenderWindow& window);
 
@@ -36,8 +34,7 @@ class World final {
   SceneNode scene_graph_;
   sf::RenderWindow& window_;
   sf::FloatRect world_bounds_;
-  sf::Vector2f world_center_;
-  const float walls_thickness_ = 10.0f;
+  const float world_bounds_thickness_ = 10.0f;
 
   Rectangle* player_;
 };

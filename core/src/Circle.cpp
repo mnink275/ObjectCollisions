@@ -1,7 +1,5 @@
 #include <Circle.hpp>
 
-#include <iostream>
-
 namespace ink {
 
 Circle::Circle(const Category category, const sf::Color color, float radius,

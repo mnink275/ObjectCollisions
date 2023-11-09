@@ -19,7 +19,8 @@ class Rectangle final : public Shape {
             const sf::Vector2f sizes);
 
   void handlePlayerInput(const sf::Event::MouseMoveEvent event);
-  std::optional<sf::Vector2f> getIntersectionNormal(sf::FloatRect other) const noexcept;
+  std::optional<sf::Vector2f> getIntersectionNormal(
+      sf::FloatRect other) const noexcept;
   void setShapePosition(sf::Vector2f posision) override;
 
  private:

@@ -1,6 +1,5 @@
 #include <World.hpp>
 
-#include <iostream>
 #include <random>
 #include <set>
 
@@ -11,7 +10,6 @@ namespace ink {
 World::World(sf::RenderWindow& window)
     : window_(window),
       world_bounds_({0.f, 0.f}, sf::Vector2f{window.getSize()}),
-      world_center_(world_bounds_.width / 2, world_bounds_.height / 2),
       player_(nullptr) {
   // spawn player
   auto player = std::make_unique<Rectangle>(Category::kPlayer, sf::Color::Blue,
@@ -106,15 +104,18 @@ void World::spawnObstacles() {
 }
 
 void World::spawnBalls() {
-  static const int velocity_bound = 500;
-  auto rand = [](){ return getRandomBetween(-velocity_bound, velocity_bound); };
-  const auto begin = 10 * walls_thickness_;
-  const auto end = world_bounds_.width - begin;
-  const auto spawn_height = 2 * walls_thickness_;
-  for (float x = begin; x < end; x += 20.0f) {
+  const int velocity_bound = 500;
+  auto rand = []() {
+    return getRandomBetween(-velocity_bound, velocity_bound);
+  };
+  const auto spawn_begin = 10 * world_bounds_thickness_;
+  const auto spawn_end = world_bounds_.width - spawn_begin;
+  const auto spawn_height = 2 * world_bounds_thickness_;
+  const auto spawn_interval = 20.0f;
+  for (float x = spawn_begin; x < spawn_end; x += spawn_interval) {
     sf::Vector2f velocity{rand(), rand()};
     auto ball = std::make_unique<Circle>(Category::kBall, sf::Color::Green,
-                                         8.0f, std::move(velocity));
+                                         8.0f, velocity);
     ball->setShapePosition({x, spawn_height});
     scene_graph_.attachChild(std::move(ball));
   }
@@ -123,22 +124,22 @@ void World::spawnBalls() {
 void World::spawnWalls() {
   auto walls_holder = std::make_unique<SceneNode>();
 
-  auto world_bounds = world_bounds_.getSize();
-  float width = world_bounds.x;
-  float height = world_bounds.y;
+  const auto world_bounds = world_bounds_.getSize();
+  const float width = world_bounds.x;
+  const float height = world_bounds.y;
 
   // `positions` contains left-top corner of the walls
   // walls "grow" from the left-top corner to the bottom-right
   static const std::vector<sf::Vector2f> positions = {
-      {0.0f, 0.0f},                        // left
-      {0.0f, 0.0f},                        // top
-      {width - walls_thickness_, 0.0f},    // right
-      {0.0f, height - walls_thickness_}};  // bottom
+      {0.0f, 0.0f},                               // left
+      {0.0f, 0.0f},                               // top
+      {width - world_bounds_thickness_, 0.0f},    // right
+      {0.0f, height - world_bounds_thickness_}};  // bottom
   static const std::vector<sf::Vector2f> sizes = {
-      {walls_thickness_, height},  // left
-      {width, walls_thickness_},   // top
-      {walls_thickness_, height},  // right
-      {width, walls_thickness_}};  // bottom
+      {world_bounds_thickness_, height},  // left
+      {width, world_bounds_thickness_},   // top
+      {world_bounds_thickness_, height},  // right
+      {width, world_bounds_thickness_}};  // bottom
 
   assert(positions.size() == sizes.size());
   static const std::size_t kWallsCount = positions.size();

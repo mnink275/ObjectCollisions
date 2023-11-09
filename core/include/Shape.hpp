@@ -11,7 +11,7 @@ class Shape : public SceneNode {
         std::unique_ptr<sf::Shape> shape);
 
   sf::FloatRect getBoundingRect() const override;
-  virtual void setShapePosition(sf::Vector2f posision);
+  virtual void setShapePosition(sf::Vector2f position);
   void handleObstacleCollision(Shape* obstacle);
 
  private:

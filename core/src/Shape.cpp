@@ -12,7 +12,7 @@ sf::FloatRect Shape::getBoundingRect() const {
   return getWorldTransform().transformRect(shape_->getGlobalBounds());
 }
 
-void Shape::setShapePosition(sf::Vector2f posision) { setPosition(posision); }
+void Shape::setShapePosition(sf::Vector2f position) { setPosition(position); }
 
 void Shape::handleObstacleCollision(Shape* obstacle) {
   auto intersection_opt =

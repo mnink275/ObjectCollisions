@@ -7,17 +7,17 @@ namespace ink {
 SceneNode::SceneNode(Category category)
     : children_(), parent_(nullptr), category_(category) {}
 
-void SceneNode::attachChild(Ptr child) {
+void SceneNode::attachChild(NodePtr child) {
   child->parent_ = this;
   children_.push_back(std::move(child));
 }
 
-SceneNode::Ptr SceneNode::detachChild(const SceneNode& node) {
+SceneNode::NodePtr SceneNode::detachChild(const SceneNode& node) {
   const auto found =
       std::find_if(children_.begin(), children_.end(),
-                   [&](const Ptr& p) -> bool { return p.get() == &node; });
+                   [&](const NodePtr& p) -> bool { return p.get() == &node; });
   assert(found != children_.end());
-  Ptr result = std::move(*found);
+  NodePtr result = std::move(*found);
   result->parent_ = nullptr;
   children_.erase(found);
   return result;
@@ -64,7 +64,7 @@ void SceneNode::draw(sf::RenderTarget& target,
   sf::RenderStates node_states(states);
   node_states.transform *= getTransform();
   drawCurrent(target, node_states);
-  for (const Ptr& child : children_) {
+  for (const NodePtr& child : children_) {
     child->draw(target, node_states);
   }
 }
@@ -72,7 +72,7 @@ void SceneNode::draw(sf::RenderTarget& target,
 void SceneNode::drawCurrent(sf::RenderTarget& /*target*/,
                             const sf::RenderStates /*states*/) const {}
 
-void SceneNode::updateCurrent(sf::Time) {}
+void SceneNode::updateCurrent(sf::Time /*dt*/) {}
 
 void SceneNode::updateChildren(const sf::Time dt) const {
   for (auto&& child : children_) {
