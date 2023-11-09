@@ -36,6 +36,9 @@ sf::Vector2f Rectangle::getIntersectionNormal(
   sf::Vector2f normal{};
   for (auto&& bound : bounds_) {
     auto intersection = bound.rect.findIntersection(other);
+    if (!intersection.has_value()) continue;
+    assert(intersection->width >= 0);
+    assert(intersection->height >= 0);
     auto square = intersection->width * intersection->height;
     if (square > max_intersection_square) {
       max_intersection_square = square;
@@ -48,10 +51,26 @@ sf::Vector2f Rectangle::getIntersectionNormal(
 
 void Rectangle::setShapePosition(sf::Vector2f posision) {
   setPosition(posision);
-  for (auto&& bound : bounds_) {
-    bound.rect.left += posision.x;
-    bound.rect.top += posision.y;
+  if (getCategory() == Category::kObstacle) {
+    for (auto&& bound : bounds_) {
+      bound.rect.left += posision.x;
+      bound.rect.top += posision.y;
+    }
   }
 }
+
+#if 0
+void Rectangle::drawCurrent(sf::RenderTarget& target,
+                            const sf::RenderStates states) const {
+  target.draw(*shape_, states);
+
+  for (auto&& bound : bounds_) {
+    sf::RectangleShape bounds_rect{bound.rect.getSize()};
+    bounds_rect.setPosition(bound.rect.getPosition());
+    bounds_rect.setFillColor(sf::Color::Blue);
+    target.draw(bounds_rect);
+  }
+}
+#endif
 
 }  // namespace ink

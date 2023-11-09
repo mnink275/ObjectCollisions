@@ -43,8 +43,7 @@ void World::handleCollisions() {
   scene_graph_.checkSceneCollision(scene_graph_, collisions);
   for (auto pair : collisions) {
     if (matchesCategories(pair, Category::kPlayer, Category::kObstacle)) {
-      std::cout << "Player and Obstacle collision\n";
-
+      // std::cout << "Player and Obstacle collision\n";
       assert(dynamic_cast<Rectangle*>(pair.first));
       assert(dynamic_cast<Rectangle*>(pair.second));
       auto* player = static_cast<Rectangle*>(pair.first);
@@ -52,8 +51,7 @@ void World::handleCollisions() {
 
       player->handleObstacleCollision(obstacle);
     } else if (matchesCategories(pair, Category::kBall, Category::kObstacle)) {
-      std::cout << "Ball and Obstacle collision\n";
-
+      // std::cout << "Ball and Obstacle collision\n";
       assert(dynamic_cast<Circle*>(pair.first));
       assert(dynamic_cast<Rectangle*>(pair.second));
       auto* circle = static_cast<Circle*>(pair.first);
@@ -97,10 +95,14 @@ void World::spawnObstacles() {
 }
 
 void World::spawnBalls() {
-  for (float x = 20.0f; x < world_bounds_.width; x += 40.0f) {
-    auto ball =
-        std::make_unique<Circle>(Category::kBall, sf::Color::Green, 8.0f);
-    ball->setShapePosition({x, 20.0f});
+  sf::Vector2f velocity{300.0f, 300.0f};
+  const auto begin = 2 * walls_thickness_;
+  const auto end = world_bounds_.width - 2 * walls_thickness_;
+  const auto spawn_height = 2 * walls_thickness_;
+  for (float x = begin; x < end; x += 20.0f) {
+    auto ball = std::make_unique<Circle>(Category::kBall, sf::Color::Green,
+                                         8.0f, velocity);
+    ball->setShapePosition({x, spawn_height});
     scene_graph_.attachChild(std::move(ball));
   }
 }
@@ -111,20 +113,19 @@ void World::spawnWalls() {
   auto world_bounds = world_bounds_.getSize();
   float width = world_bounds.x;
   float height = world_bounds.y;
-  const auto wall_thickness_ = 10.0f;
 
   // `positions` contains left-top corner of the walls
   // walls "grow" from the left-top corner to the bottom-right
   static const std::vector<sf::Vector2f> positions = {
-      {0.0f, 0.0f},                       // left
-      {0.0f, 0.0f},                       // top
-      {width - wall_thickness_, 0.0f},    // right
-      {0.0f, height - wall_thickness_}};  // bottom
+      {0.0f, 0.0f},                        // left
+      {0.0f, 0.0f},                        // top
+      {width - walls_thickness_, 0.0f},    // right
+      {0.0f, height - walls_thickness_}};  // bottom
   static const std::vector<sf::Vector2f> sizes = {
-      {wall_thickness_, height},  // left
-      {width, wall_thickness_},   // top
-      {wall_thickness_, height},  // right
-      {width, wall_thickness_}};  // bottom
+      {walls_thickness_, height},  // left
+      {width, walls_thickness_},   // top
+      {walls_thickness_, height},  // right
+      {width, walls_thickness_}};  // bottom
 
   assert(positions.size() == sizes.size());
   static const std::size_t kWallsCount = positions.size();

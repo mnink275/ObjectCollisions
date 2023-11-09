@@ -33,9 +33,9 @@ void Game::processEvents() {
       case sf::Event::Closed:
         window_.close();
         break;
+      // unused
       case sf::Event::KeyPressed:
       case sf::Event::KeyReleased:
-      // unused
       case sf::Event::Resized:
       case sf::Event::LostFocus:
       case sf::Event::GainedFocus:

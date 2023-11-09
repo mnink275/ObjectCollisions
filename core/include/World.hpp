@@ -36,6 +36,7 @@ class World final {
   sf::RenderWindow& window_;
   sf::FloatRect world_bounds_;
   sf::Vector2f world_center_;
+  const float walls_thickness_ = 10.0f;
 
   Rectangle* player_;
 };

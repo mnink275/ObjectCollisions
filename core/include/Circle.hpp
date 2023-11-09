@@ -7,7 +7,8 @@ namespace ink {
 class Circle final : public Shape {
  public:
   using Shape::Shape;
-  Circle(const Category category, const sf::Color color, float radius);
+  Circle(const Category category, const sf::Color color, float radius,
+         sf::Vector2f velocity);
 
   void handleElasticCollision(sf::Vector2f normal);
 
